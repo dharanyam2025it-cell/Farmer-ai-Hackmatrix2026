@@ -16,7 +16,6 @@ from flask import (
 
 from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
-
 from dotenv import load_dotenv
 
 from google import genai
@@ -75,7 +74,6 @@ else:
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         "sqlite:///farmer_ai.db"
     )
-
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -231,7 +229,6 @@ if not GEMINI_API_KEY:
         "Please add GEMINI_API_KEY to your environment variables."
     )
 
-
 client = genai.Client(
     api_key=GEMINI_API_KEY
 )
@@ -273,33 +270,21 @@ def unclear_result():
             "अच्छी रोशनी में पत्ती को साफ दिखाई देने वाली तस्वीर लें.",
 
         "suggestions_ta": [
-
             "ஒரே ஒரு இலை தெளிவாகத் தெரியும் வகையில் படம் எடுக்கவும்",
-
             "Blur இல்லாமல் படம் எடுக்கவும்",
-
             "இலைக்கு போதுமான வெளிச்சம் இருக்க வேண்டும்"
-
         ],
 
         "suggestions_en": [
-
             "Capture one leaf clearly",
-
             "Avoid blurry images",
-
             "Use sufficient lighting"
-
         ],
 
         "suggestions_hi": [
-
             "एक पत्ती को साफ दिखाई देने वाली तस्वीर लें",
-
             "धुंधली तस्वीर से बचें",
-
             "पर्याप्त रोशनी रखें"
-
         ],
 
         "confidence": 0,
@@ -341,7 +326,6 @@ def selected_upload():
         file = request.files.get(field)
 
         if file and file.filename:
-
             return file
 
     return None
@@ -359,11 +343,6 @@ def analyze_leaf_image(filepath):
             filepath
         ).convert("RGB")
 
-
-        # -------------------------------------------------
-        # Convert image to bytes
-        # -------------------------------------------------
-
         image_bytes = io.BytesIO()
 
         image.save(
@@ -373,26 +352,12 @@ def analyze_leaf_image(filepath):
 
         image_data = image_bytes.getvalue()
 
-
-        # -------------------------------------------------
-        # Gemini image part
-        # -------------------------------------------------
-
         image_part = types.Part.from_bytes(
-
             data=image_data,
-
             mime_type="image/jpeg"
-
         )
 
-
-        # -------------------------------------------------
-        # Prompt
-        # -------------------------------------------------
-
         prompt = """
-
 You are an agricultural plant disease analysis assistant.
 
 Analyze the uploaded plant leaf image carefully.
@@ -402,55 +367,40 @@ Identify the crop and possible disease based ONLY on visible evidence.
 IMPORTANT RULES:
 
 1. Do not claim 100% certainty.
-2. If the image is blurry, unclear, too dark, or does not show a leaf
-   clearly, mark the result as uncertain.
+2. If the image is blurry, unclear, too dark, or does not show a leaf clearly,
+   mark the result as uncertain.
 3. Do not invent symptoms that are not visible.
-4. If you cannot reliably identify the crop or disease, return
-   "Uncertain".
+4. If you cannot reliably identify the crop or disease, return "Uncertain".
 5. Give a confidence score from 0 to 100.
-6. The confidence score is an estimate, not a scientifically validated
-   probability.
+6. The confidence score is an estimate, not a scientifically validated probability.
 7. Give practical general agricultural advice.
 8. Do not recommend dangerous chemical use or unsafe pesticide handling.
-9. For severe disease cases, recommend consulting a qualified
-   agriculture professional.
+9. For severe disease cases, recommend consulting a qualified agriculture professional.
 10. Return ONLY valid JSON.
 
 Return this exact JSON structure:
 
 {
     "crop": "Crop name",
-
     "disease_en": "Disease name in English",
-
     "disease_ta": "Disease name in Tamil",
-
     "disease_hi": "Disease name in Hindi",
-
     "confidence": 0,
 
     "symptoms_en": "Visible symptoms in English",
-
     "symptoms_ta": "Visible symptoms in Tamil",
-
     "symptoms_hi": "Visible symptoms in Hindi",
 
     "cause_en": "Possible cause in English",
-
     "cause_ta": "Possible cause in Tamil",
-
     "cause_hi": "Possible cause in Hindi",
 
     "remedy_en": "General treatment or management advice in English",
-
     "remedy_ta": "General treatment or management advice in Tamil",
-
     "remedy_hi": "General treatment or management advice in Hindi",
 
     "prevention_en": "Prevention advice in English",
-
     "prevention_ta": "Prevention advice in Tamil",
-
     "prevention_hi": "Prevention advice in Hindi",
 
     "suggestions_en": [
@@ -471,13 +421,7 @@ Return this exact JSON structure:
         "Suggestion 3"
     ]
 }
-
 """
-
-
-        # -------------------------------------------------
-        # Gemini request
-        # -------------------------------------------------
 
         response = client.models.generate_content(
 
@@ -489,28 +433,15 @@ Return this exact JSON structure:
             ],
 
             config=types.GenerateContentConfig(
-
                 response_mime_type="application/json"
-
             )
-
         )
-
-
-        # -------------------------------------------------
-        # Parse response
-        # -------------------------------------------------
 
         raw_text = response.text.strip()
 
         result = json.loads(
             raw_text
         )
-
-
-        # -------------------------------------------------
-        # Defaults
-        # -------------------------------------------------
 
         result.setdefault(
             "crop",
@@ -594,7 +525,7 @@ Return this exact JSON structure:
 
         result.setdefault(
             "prevention_hi",
-            "पौधे की नियमित निगरानी மற்றும் நல்ல பராமரிப்பை செய்யவும்."
+            "पौधे की नियमित निगरानी और अच्छी देखभाल करें."
         )
 
         result.setdefault(
@@ -612,11 +543,6 @@ Return this exact JSON structure:
             []
         )
 
-
-        # -------------------------------------------------
-        # Confidence
-        # -------------------------------------------------
-
         try:
 
             result["confidence"] = int(
@@ -630,7 +556,6 @@ Return this exact JSON structure:
 
             result["confidence"] = 0
 
-
         result["confidence"] = max(
             0,
             min(
@@ -639,22 +564,14 @@ Return this exact JSON structure:
             )
         )
 
-
-        # -------------------------------------------------
-        # Metrics
-        # -------------------------------------------------
-
         result["metrics"] = {
 
             "ai_analysis": True,
 
             "model": "gemini-3.5-flash"
-
         }
 
-
         return result
-
 
     except (
         UnidentifiedImageError,
@@ -663,7 +580,6 @@ Return this exact JSON structure:
 
         return unclear_result()
 
-
     except json.JSONDecodeError:
 
         print(
@@ -671,7 +587,6 @@ Return this exact JSON structure:
         )
 
         return unclear_result()
-
 
     except Exception as e:
 
@@ -736,7 +651,6 @@ def test_user():
         "hash_length": len(
             user.password
         ) if user.password else 0
-
     }
 
 
@@ -756,7 +670,6 @@ def login():
             url_for("home")
         )
 
-
     if request.method == "POST":
 
         email = request.form.get(
@@ -769,11 +682,9 @@ def login():
             ""
         )
 
-
         user = User.query.filter_by(
             email=email
         ).first()
-
 
         if user:
 
@@ -790,7 +701,6 @@ def login():
                 email
             )
 
-
         if user and check_password_hash(
             user.password,
             password
@@ -803,24 +713,20 @@ def login():
                 "success"
             )
 
-
             if user.role == "admin":
 
                 return redirect(
                     url_for("admin_dashboard")
                 )
 
-
             return redirect(
                 url_for("home")
             )
-
 
         flash(
             "Invalid email or password.",
             "error"
         )
-
 
     return render_template(
         "login.html"
@@ -843,7 +749,6 @@ def register():
             url_for("home")
         )
 
-
     if request.method == "POST":
 
         name = request.form.get(
@@ -861,7 +766,6 @@ def register():
             ""
         )
 
-
         if not name or not email or not password:
 
             flash(
@@ -873,11 +777,9 @@ def register():
                 "register.html"
             )
 
-
         existing_user = User.query.filter_by(
             email=email
         ).first()
-
 
         if existing_user:
 
@@ -890,7 +792,6 @@ def register():
                 "register.html"
             )
 
-
         new_user = User(
 
             name=name,
@@ -902,9 +803,7 @@ def register():
             ),
 
             role="user"
-
         )
-
 
         db.session.add(
             new_user
@@ -912,17 +811,14 @@ def register():
 
         db.session.commit()
 
-
         flash(
             "Registration successful. Please login.",
             "success"
         )
 
-
         return redirect(
             url_for("login")
         )
-
 
     return render_template(
         "register.html"
@@ -967,9 +863,7 @@ def home():
 
     ).limit(5).all()
 
-
     recent_scans = []
-
 
     for scan in user_scans:
 
@@ -986,9 +880,7 @@ def home():
             ),
 
             "image_url": scan.image_url
-
         })
-
 
     return render_template(
 
@@ -999,7 +891,6 @@ def home():
         error=None,
 
         user=current_user
-
     )
 
 
@@ -1018,7 +909,6 @@ def uploaded_file(filename):
         app.config["UPLOAD_FOLDER"],
 
         filename
-
     )
 
 
@@ -1038,9 +928,7 @@ def predict():
         "ta"
     )
 
-
     file = selected_upload()
-
 
     if not file:
 
@@ -1053,14 +941,11 @@ def predict():
             error="Please choose or take one photo first.",
 
             user=current_user
-
         )
-
 
     filename = secure_filename(
         file.filename
     )
-
 
     if not filename:
 
@@ -1073,55 +958,34 @@ def predict():
             error="Invalid image file.",
 
             user=current_user
-
         )
-
-
-    # -----------------------------------------------------
-    # Avoid duplicate filenames
-    # -----------------------------------------------------
 
     timestamp = datetime.now().strftime(
         "%Y%m%d%H%M%S"
     )
 
-
     filename = (
         f"{current_user.id}_{timestamp}_{filename}"
     )
-
 
     filepath = os.path.join(
 
         app.config["UPLOAD_FOLDER"],
 
         filename
-
     )
-
 
     file.save(
         filepath
     )
 
-
     uploaded_url = (
         f"/uploads/{filename}"
     )
 
-
-    # -----------------------------------------------------
-    # AI prediction
-    # -----------------------------------------------------
-
     result = analyze_leaf_image(
         filepath
     )
-
-
-    # -----------------------------------------------------
-    # SAVE SCAN TO DATABASE
-    # -----------------------------------------------------
 
     scan = Scan(
 
@@ -1153,20 +1017,13 @@ def predict():
             "confidence",
             0
         )
-
     )
-
 
     db.session.add(
         scan
     )
 
     db.session.commit()
-
-
-    # -----------------------------------------------------
-    # Recent scans
-    # -----------------------------------------------------
 
     user_scans = Scan.query.filter_by(
 
@@ -1178,9 +1035,7 @@ def predict():
 
     ).limit(5).all()
 
-
     recent_scans = []
-
 
     for item in user_scans:
 
@@ -1197,13 +1052,7 @@ def predict():
             ),
 
             "image_url": item.image_url
-
         })
-
-
-    # -----------------------------------------------------
-    # Result page
-    # -----------------------------------------------------
 
     return render_template(
 
@@ -1218,7 +1067,6 @@ def predict():
         recent_scans=recent_scans,
 
         user=current_user
-
     )
 
 
@@ -1241,16 +1089,13 @@ def admin_dashboard():
             url_for("home")
         )
 
-
     users = User.query.order_by(
         User.created_at.desc()
     ).all()
 
-
     scans = Scan.query.order_by(
         Scan.created_at.desc()
     ).all()
-
 
     return render_template(
 
@@ -1261,7 +1106,6 @@ def admin_dashboard():
         scans=scans,
 
         user=current_user
-
     )
 
 
@@ -1288,16 +1132,13 @@ with app.app_context():
         "ADMIN_PASSWORD"
     )
 
-
     if admin_email and admin_password:
 
         admin_email = admin_email.strip().lower()
 
-
         existing_admin = User.query.filter_by(
             email=admin_email
         ).first()
-
 
         if existing_admin:
 
@@ -1323,7 +1164,6 @@ with app.app_context():
                     "Admin already exists."
                 )
 
-
         else:
 
             new_admin = User(
@@ -1337,16 +1177,13 @@ with app.app_context():
                 ),
 
                 role="admin"
-
             )
-
 
             db.session.add(
                 new_admin
             )
 
             db.session.commit()
-
 
             print(
                 "Admin created successfully."
@@ -1366,11 +1203,7 @@ with app.app_context():
 if __name__ == "__main__":
 
     app.run(
-
         host="0.0.0.0",
-
         port=5000,
-
         debug=True
-
     )
