@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>பயிர் நோய் | Farmer AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-lang="ta">
+    <main class="mobile-app-wrap">
+        <section class="phone-app home-screen">
+            <header class="app-topbar">
+                <div class="app-brand">
+                    <span class="app-logo" aria-hidden="true"></span>
+                    <div>
+                        <h1><span class="ta">பயிர் நோய்</span><span class="en">Crop Care</span><span class="hi">फसल सेवा</span></h1>
+                        <p><span class="ta">கண்டறிதல் மற்றும் தீர்வு</span><span class="en">Detect and remedy</span><span class="hi">रोग पहचान और उपाय</span></p>
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-button" type="button" data-open-recents aria-label="Recent scans">▤</button>
+                    <label class="mini-lang">
+                        <select id="languageSelect" aria-label="Language">
+                            <option value="ta">தமிழ்</option>
+                            <option value="en">EN</option>
+                            <option value="hi">हिंदी</option>
+                        </select>
+                    </label>
+                </div>
+            </header>
+
+            <div class="farmer-hero">
+                <img src="{{ url_for('static', filename='images/farmer.png') }}" alt="Farmer">
+            </div>
+
+            <form class="scan-sheet" action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="lang" id="selectedLang" value="ta">
+
+                <button class="mic-button" type="button" aria-label="Voice assistant"></button>
+                <h2><span class="ta">படம் எடுத்து நோய் கண்டறியுங்கள்</span><span class="en">Scan a photo to detect disease</span><span class="hi">फोटो लेकर रोग पहचानें</span></h2>
+                <p><span class="ta">Camera அல்லது Gallery-ல் இருந்து ஒரு இலை படத்தை தேர்வு செய்யவும்.</span><span class="en">Choose one leaf photo from camera or gallery.</span><span class="hi">कैमरा या गैलरी से एक पत्ती की फोटो चुनें.</span></p>
+
+                {% if error %}
+                    <p class="form-error">{{ error }}</p>
+                {% endif %}
+
+                <div class="upload-actions">
+                    <label class="upload-tile">
+                        <input type="file" name="camera_image" accept="image/*" capture="environment">
+                        <span class="tile-camera" aria-hidden="true"></span>
+                        <strong><span class="ta">படம் எடுக்க</span><span class="en">Take Photo</span><span class="hi">फोटो लें</span></strong>
+                    </label>
+
+                    <label class="upload-tile">
+                        <input type="file" name="gallery_image" accept="image/*">
+                        <span class="tile-gallery" aria-hidden="true"></span>
+                        <strong><span class="ta">Upload</span><span class="en">Upload</span><span class="hi">अपलोड</span></strong>
+                    </label>
+                </div>
+
+                <p class="file-name" id="fileName"><span class="ta">படம் தேர்வு செய்யப்படவில்லை</span><span class="en">No photo selected</span><span class="hi">फोटो नहीं चुनी गई</span></p>
+                <button class="scan-button" type="submit"><span class="ta">AI மூலம் ஆய்வு செய்</span><span class="en">Scan with AI</span><span class="hi">AI से जांचें</span></button>
+            </form>
+        </section>
+
+        <aside class="recent-drawer" id="recentDrawer" aria-hidden="true">
+            <div class="drawer-card">
+                <div class="drawer-head">
+                    <h2><span class="ta">முன் பதிவுகள்</span><span class="en">Recent Scans</span><span class="hi">पुराने स्कैन</span></h2>
+                    <button class="icon-button" type="button" data-close-recents aria-label="Close">×</button>
+                </div>
+                {% if recent_scans %}
+                    <div class="recent-list">
+                        {% for item in recent_scans %}
+                        <div class="recent-item">
+                            <img src="{{ item.image_url }}" alt="">
+                            <div>
+                                <strong><span class="ta">{{ item.title_ta }}</span><span class="en">{{ item.title_en }}</span><span class="hi">{{ item.title_hi }}</span></strong>
+                                <small>{{ item.date }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-state"><span class="ta">இன்னும் scan save ஆகவில்லை.</span><span class="en">No saved scans yet.</span><span class="hi">अभी कोई स्कैन सेव नहीं है.</span></p>
+                {% endif %}
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const body = document.body;
+        const languageSelect = document.getElementById("languageSelect");
+        const selectedLang = document.getElementById("selectedLang");
+        const fileName = document.getElementById("fileName");
+        const drawer = document.getElementById("recentDrawer");
+
+        languageSelect.addEventListener("change", () => {
+            body.dataset.lang = languageSelect.value;
+            selectedLang.value = languageSelect.value;
+            document.documentElement.lang = languageSelect.value;
+        });
+
+        document.querySelectorAll('input[type="file"]').forEach((input) => {
+            input.addEventListener("change", () => {
+                const file = input.files && input.files[0];
+                if (file) fileName.textContent = file.name;
+            });
+        });
+
+        document.querySelector("[data-open-recents]").addEventListener("click", () => {
+            drawer.classList.add("open");
+            drawer.setAttribute("aria-hidden", "false");
+        });
+
+        document.querySelector("[data-close-recents]").addEventListener("click", () => {
+            drawer.classList.remove("open");
+            drawer.setAttribute("aria-hidden", "true");
+        });
+    </script>
+</body>
+</html>
