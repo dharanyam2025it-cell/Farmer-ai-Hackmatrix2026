@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-git add templates/result.html    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>பயிர் நோய் | Farmer AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -81,11 +81,15 @@ git add templates/result.html    <meta charset="UTF-8">
                         </div>
                         {% endfor %}
                     </div>
+
+        </aside>
                 {% else %}
                     <p class="empty-state"><span class="ta">இன்னும் scan save ஆகவில்லை.</span><span class="en">No saved scans yet.</span><span class="hi">अभी कोई स्कैन सेव नहीं है.</span></p>
                 {% endif %}
             </div>
-        </aside>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">
+    🚪 Logout
+</a>
     </main>
 
     <script>

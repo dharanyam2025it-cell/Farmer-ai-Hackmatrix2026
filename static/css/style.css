@@ -1532,3 +1532,19 @@ body[data-lang="hi"] .en {
         height: 292px;
     }
 }
+
+.logout-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: #c92116;
+    color: white;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.logout-btn:hover {
+    background: #a51b12;
+}

@@ -2,4 +2,6 @@ venv/
 .env
 __pycache__/
 *.pyc
-uploads/*
+instance/
+farmer_ai.db
+uploads/

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmer AI - Admin Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(225, 247, 255, 0.72),
+                    rgba(246, 243, 232, 0.92)
+                ),
+                url("{{ url_for('static', filename='images/bg.jpg') }}")
+                center / cover fixed;
+            color: #182018;
+        }
+
+        .container {
+            width: min(1150px, 94%);
+            margin: 30px auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 24px 28px;
+            border-radius: 22px;
+            background: rgba(255, 253, 246, 0.96);
+            box-shadow: 0 15px 35px rgba(24, 32, 24, 0.15);
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #167236;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: #667064;
+        }
+
+        .logout {
+            padding: 11px 18px;
+            border-radius: 12px;
+            background: #c92116;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            border-radius: 18px;
+            background: rgba(255, 253, 246, 0.96);
+            box-shadow: 0 12px 28px rgba(24, 32, 24, 0.10);
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            color: #167236;
+            font-size: 32px;
+        }
+
+        .stat-card p {
+            margin: 8px 0 0;
+            color: #667064;
+        }
+
+        .section {
+            margin-top: 22px;
+            padding: 24px;
+            border-radius: 20px;
+            background: rgba(255, 253, 246, 0.96);
+            box-shadow: 0 12px 28px rgba(24, 32, 24, 0.10);
+            overflow-x: auto;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: #0d4d24;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dfe5d8;
+            text-align: left;
+        }
+
+        th {
+            background: #e8f6e8;
+            color: #0d4d24;
+        }
+
+        tr:hover {
+            background: #f6f9f0;
+        }
+
+        .role-admin {
+            color: #c92116;
+            font-weight: bold;
+        }
+
+        .role-user {
+            color: #167236;
+            font-weight: bold;
+        }
+
+        .scan-image {
+            width: 65px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .empty {
+            color: #667064;
+            padding: 15px 0;
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 94%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div>
+            <h1>🌱 Farmer AI Admin</h1>
+
+            <p>
+                Welcome, {{ current_user.name }}
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="logout"
+        >
+            🚪 Logout
+        </a>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h2>{{ users|length }}</h2>
+            <p>Registered Users</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ scans|length }}</h2>
+            <p>Total Scans</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>AI</h2>
+            <p>Plant Disease Analysis</p>
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>👥 Registered Users</h2>
+
+        {% if users %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for user in users %}
+
+                <tr>
+
+                    <td>{{ user.id }}</td>
+
+                    <td>{{ user.name }}</td>
+
+                    <td>{{ user.email }}</td>
+
+                    <td>
+                        {% if user.role == "admin" %}
+                            <span class="role-admin">
+                                Admin
+                            </span>
+                        {% else %}
+                            <span class="role-user">
+                                User
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ user.created_at.strftime("%d %b %Y") }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <p class="empty">
+            No users registered yet.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>📷 Recent AI Scans</h2>
+
+        {% if scans %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Image</th>
+                    <th>Crop</th>
+                    <th>Disease</th>
+                    <th>Confidence</th>
+                    <th>Date</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for scan in scans %}
+
+                <tr>
+
+                    <td>{{ scan.id }}</td>
+
+                    <td>{{ scan.user_id }}</td>
+
+                    <td>
+
+                        <img
+                            src="{{ scan.image_url }}"
+                            class="scan-image"
+                            alt="Leaf"
+                        >
+
+                    </td>
+
+                    <td>
+                        {{ scan.crop }}
+                    </td>
+
+                    <td>
+                        {{ scan.disease_en }}
+                    </td>
+
+                    <td>
+                        {{ scan.confidence }}%
+                    </td>
+
+                    <td>
+                        {{ scan.created_at.strftime("%d %b %Y %H:%M") }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <p class="empty">
+            No scans available yet.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
