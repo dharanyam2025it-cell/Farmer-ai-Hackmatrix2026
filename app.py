@@ -854,6 +854,48 @@ def register():
 
 
 # =========================================================
+# TEMPORARY ADMIN SETUP
+# =========================================================
+
+@app.route("/setup-admin")
+def setup_admin():
+
+    admin_email = "admin@farmerai.com"
+    admin_password = "Admin@12345"
+
+    existing_user = User.query.filter_by(
+        email=admin_email
+    ).first()
+
+    if existing_user:
+
+        return f"""
+        <h2>Admin already exists!</h2>
+        <p>Email: {admin_email}</p>
+        <p>Password: {admin_password}</p>
+        """
+
+    admin = User(
+        name="Admin",
+        email=admin_email,
+        password=generate_password_hash(
+            admin_password
+        ),
+        role="admin"
+    )
+
+    db.session.add(admin)
+    db.session.commit()
+
+    return f"""
+    <h2>Admin created successfully!</h2>
+    <p>Email: {admin_email}</p>
+    <p>Password: {admin_password}</p>
+    <p><a href="/login">Go to Login</a></p>
+    """
+
+
+# =========================================================
 # LOGOUT
 # =========================================================
 
