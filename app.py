@@ -1,3 +1,4 @@
+
 import os
 import json
 import io
@@ -17,10 +18,12 @@ from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
+
 from google import genai
 from google.genai import types
 
 from flask_sqlalchemy import SQLAlchemy
+
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -69,7 +72,6 @@ if database_url:
 
 else:
 
-    # Local fallback
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         "sqlite:///farmer_ai.db"
     )
@@ -304,10 +306,23 @@ def unclear_result():
 
         "crop": "Unknown",
 
-        "symptoms":
+        "symptoms_en":
             "Image quality is insufficient for reliable analysis.",
 
-        "cause": "Unknown"
+        "symptoms_ta":
+            "தெளிவான அறிகுறிகளை கண்டறிய முடியவில்லை.",
+
+        "symptoms_hi":
+            "स्पष्ट लक्षण निर्धारित नहीं किए जा सके.",
+
+        "cause_en":
+            "Unknown",
+
+        "cause_ta":
+            "காரணம் தெளிவாக தெரியவில்லை.",
+
+        "cause_hi":
+            "कारण स्पष्ट नहीं है."
     }
 
 
@@ -326,6 +341,7 @@ def selected_upload():
         file = request.files.get(field)
 
         if file and file.filename:
+
             return file
 
     return None
@@ -376,12 +392,12 @@ def analyze_leaf_image(filepath):
         # -------------------------------------------------
 
         prompt = """
+
 You are an agricultural plant disease analysis assistant.
 
 Analyze the uploaded plant leaf image carefully.
 
-Your task is to identify the crop and possible disease based ONLY on
-visible evidence in the image.
+Identify the crop and possible disease based ONLY on visible evidence.
 
 IMPORTANT RULES:
 
@@ -389,7 +405,7 @@ IMPORTANT RULES:
 2. If the image is blurry, unclear, too dark, or does not show a leaf
    clearly, mark the result as uncertain.
 3. Do not invent symptoms that are not visible.
-4. If you cannot reliably identify the crop or disease, return:
+4. If you cannot reliably identify the crop or disease, return
    "Uncertain".
 5. Give a confidence score from 0 to 100.
 6. The confidence score is an estimate, not a scientifically validated
@@ -455,6 +471,7 @@ Return this exact JSON structure:
         "Suggestion 3"
     ]
 }
+
 """
 
 
@@ -577,7 +594,7 @@ Return this exact JSON structure:
 
         result.setdefault(
             "prevention_hi",
-            "पौधे की नियमित निगरानी और अच्छी देखभाल करें."
+            "पौधे की नियमित निगरानी மற்றும் நல்ல பராமரிப்பை செய்யவும்."
         )
 
         result.setdefault(
@@ -681,26 +698,52 @@ Return this exact JSON structure:
 
 
 # =========================================================
-# LOGIN PAGE
+# TEST USER
 # =========================================================
+
 @app.route("/test-user")
 def test_user():
 
-    email = request.args.get("email", "").strip().lower()
+    email = request.args.get(
+        "email",
+        ""
+    ).strip().lower()
 
-    user = User.query.filter_by(email=email).first()
+    if not email:
+        return "Please provide email."
+
+    user = User.query.filter_by(
+        email=email
+    ).first()
 
     if not user:
         return "USER NOT FOUND"
 
     return {
+
         "id": user.id,
+
         "name": user.name,
+
         "email": user.email,
+
         "role": user.role,
-        "password_hash_exists": bool(user.password),
-        "hash_length": len(user.password) if user.password else 0
+
+        "password_hash_exists": bool(
+            user.password
+        ),
+
+        "hash_length": len(
+            user.password
+        ) if user.password else 0
+
     }
+
+
+# =========================================================
+# LOGIN PAGE
+# =========================================================
+
 @app.route(
     "/login",
     methods=["GET", "POST"]
@@ -730,6 +773,22 @@ def login():
         user = User.query.filter_by(
             email=email
         ).first()
+
+
+        if user:
+
+            print(
+                "LOGIN USER FOUND:",
+                user.email,
+                user.role
+            )
+
+        else:
+
+            print(
+                "LOGIN USER NOT FOUND:",
+                email
+            )
 
 
         if user and check_password_hash(
@@ -870,7 +929,6 @@ def register():
     )
 
 
-
 # =========================================================
 # LOGOUT
 # =========================================================
@@ -927,10 +985,7 @@ def home():
                 "%d %b %Y"
             ),
 
-            "image_url": url_for(
-    "uploaded_file",
-    filename=scan.image_url.split("/uploads/")[-1]
-)
+            "image_url": scan.image_url
 
         })
 
@@ -1141,10 +1196,7 @@ def predict():
                 "%d %b %Y"
             ),
 
-            "image_url": url_for(
-    "uploaded_file",
-    filename=item.image_url.split("/uploads/")[-1]
-)
+            "image_url": item.image_url
 
         })
 
@@ -1223,7 +1275,7 @@ with app.app_context():
 
 
 # =========================================================
-# AUTO CREATE ADMIN
+# AUTO CREATE / UPDATE ADMIN
 # =========================================================
 
 with app.app_context():
@@ -1252,6 +1304,12 @@ with app.app_context():
             if existing_admin.role != "admin":
 
                 existing_admin.role = "admin"
+
+                existing_admin.password = (
+                    generate_password_hash(
+                        admin_password
+                    )
+                )
 
                 db.session.commit()
 
@@ -1293,6 +1351,12 @@ with app.app_context():
             print(
                 "Admin created successfully."
             )
+
+    else:
+
+        print(
+            "ADMIN_EMAIL or ADMIN_PASSWORD not set."
+        )
 
 
 # =========================================================
