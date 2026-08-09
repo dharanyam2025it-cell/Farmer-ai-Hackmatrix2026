@@ -683,7 +683,24 @@ Return this exact JSON structure:
 # =========================================================
 # LOGIN PAGE
 # =========================================================
+@app.route("/test-user")
+def test_user():
 
+    email = request.args.get("email", "").strip().lower()
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return "USER NOT FOUND"
+
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "role": user.role,
+        "password_hash_exists": bool(user.password),
+        "hash_length": len(user.password) if user.password else 0
+    }
 @app.route(
     "/login",
     methods=["GET", "POST"]
@@ -853,46 +870,6 @@ def register():
     )
 
 
-# =========================================================
-# TEMPORARY ADMIN SETUP
-# =========================================================
-
-@app.route("/setup-admin")
-def setup_admin():
-
-    admin_email = "admin@farmerai.com"
-    admin_password = "Admin@12345"
-
-    existing_user = User.query.filter_by(
-        email=admin_email
-    ).first()
-
-    if existing_user:
-
-        return f"""
-        <h2>Admin already exists!</h2>
-        <p>Email: {admin_email}</p>
-        <p>Password: {admin_password}</p>
-        """
-
-    admin = User(
-        name="Admin",
-        email=admin_email,
-        password=generate_password_hash(
-            admin_password
-        ),
-        role="admin"
-    )
-
-    db.session.add(admin)
-    db.session.commit()
-
-    return f"""
-    <h2>Admin created successfully!</h2>
-    <p>Email: {admin_email}</p>
-    <p>Password: {admin_password}</p>
-    <p><a href="/login">Go to Login</a></p>
-    """
 
 # =========================================================
 # LOGOUT
