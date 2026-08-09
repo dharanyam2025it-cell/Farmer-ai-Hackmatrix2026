@@ -1,5 +1,6 @@
 import os
 import json
+import io
 from datetime import datetime
 
 from flask import (
@@ -43,8 +44,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# IMPORTANT:
-# Add SECRET_KEY in Render Environment Variables.
 app.config["SECRET_KEY"] = os.getenv(
     "SECRET_KEY",
     "development-secret-key-change-this"
@@ -60,7 +59,6 @@ database_url = os.getenv("DATABASE_URL")
 if database_url:
 
     if database_url.startswith("postgres://"):
-
         database_url = database_url.replace(
             "postgres://",
             "postgresql://",
@@ -278,7 +276,7 @@ def unclear_result():
 
             "Blur இல்லாமல் படம் எடுக்கவும்",
 
-            "இலைக்கு போதுமான வெளிச்சம் இருக்க வேண்டும்",
+            "இலைக்கு போதுமான வெளிச்சம் இருக்க வேண்டும்"
 
         ],
 
@@ -288,7 +286,7 @@ def unclear_result():
 
             "Avoid blurry images",
 
-            "Use sufficient lighting",
+            "Use sufficient lighting"
 
         ],
 
@@ -298,7 +296,7 @@ def unclear_result():
 
             "धुंधली तस्वीर से बचें",
 
-            "पर्याप्त रोशनी रखें",
+            "पर्याप्त रोशनी रखें"
 
         ],
 
@@ -309,7 +307,7 @@ def unclear_result():
         "symptoms":
             "Image quality is insufficient for reliable analysis.",
 
-        "cause": "Unknown",
+        "cause": "Unknown"
     }
 
 
@@ -328,7 +326,6 @@ def selected_upload():
         file = request.files.get(field)
 
         if file and file.filename:
-
             return file
 
     return None
@@ -350,8 +347,6 @@ def analyze_leaf_image(filepath):
         # -------------------------------------------------
         # Convert image to bytes
         # -------------------------------------------------
-
-        import io
 
         image_bytes = io.BytesIO()
 
@@ -381,7 +376,6 @@ def analyze_leaf_image(filepath):
         # -------------------------------------------------
 
         prompt = """
-
 You are an agricultural plant disease analysis assistant.
 
 Analyze the uploaded plant leaf image carefully.
@@ -409,59 +403,58 @@ IMPORTANT RULES:
 Return this exact JSON structure:
 
 {
-  "crop": "Crop name",
+    "crop": "Crop name",
 
-  "disease_en": "Disease name in English",
+    "disease_en": "Disease name in English",
 
-  "disease_ta": "Disease name in Tamil",
+    "disease_ta": "Disease name in Tamil",
 
-  "disease_hi": "Disease name in Hindi",
+    "disease_hi": "Disease name in Hindi",
 
-  "confidence": 0,
+    "confidence": 0,
 
-  "symptoms_en": "Visible symptoms in English",
+    "symptoms_en": "Visible symptoms in English",
 
-  "symptoms_ta": "Visible symptoms in Tamil",
+    "symptoms_ta": "Visible symptoms in Tamil",
 
-  "symptoms_hi": "Visible symptoms in Hindi",
+    "symptoms_hi": "Visible symptoms in Hindi",
 
-  "cause_en": "Possible cause in English",
+    "cause_en": "Possible cause in English",
 
-  "cause_ta": "Possible cause in Tamil",
+    "cause_ta": "Possible cause in Tamil",
 
-  "cause_hi": "Possible cause in Hindi",
+    "cause_hi": "Possible cause in Hindi",
 
-  "remedy_en": "General treatment or management advice in English",
+    "remedy_en": "General treatment or management advice in English",
 
-  "remedy_ta": "General treatment or management advice in Tamil",
+    "remedy_ta": "General treatment or management advice in Tamil",
 
-  "remedy_hi": "General treatment or management advice in Hindi",
+    "remedy_hi": "General treatment or management advice in Hindi",
 
-  "prevention_en": "Prevention advice in English",
+    "prevention_en": "Prevention advice in English",
 
-  "prevention_ta": "Prevention advice in Tamil",
+    "prevention_ta": "Prevention advice in Tamil",
 
-  "prevention_hi": "Prevention advice in Hindi",
+    "prevention_hi": "Prevention advice in Hindi",
 
-  "suggestions_en": [
-    "Suggestion 1",
-    "Suggestion 2",
-    "Suggestion 3"
-  ],
+    "suggestions_en": [
+        "Suggestion 1",
+        "Suggestion 2",
+        "Suggestion 3"
+    ],
 
-  "suggestions_ta": [
-    "Suggestion 1",
-    "Suggestion 2",
-    "Suggestion 3"
-  ],
+    "suggestions_ta": [
+        "Suggestion 1",
+        "Suggestion 2",
+        "Suggestion 3"
+    ],
 
-  "suggestions_hi": [
-    "Suggestion 1",
-    "Suggestion 2",
-    "Suggestion 3"
-  ]
+    "suggestions_hi": [
+        "Suggestion 1",
+        "Suggestion 2",
+        "Suggestion 3"
+    ]
 }
-
 """
 
 
@@ -622,14 +615,11 @@ Return this exact JSON structure:
 
 
         result["confidence"] = max(
-
             0,
-
             min(
                 100,
                 result["confidence"]
             )
-
         )
 
 
@@ -737,11 +727,13 @@ def login():
                 "success"
             )
 
+
             if user.role == "admin":
 
                 return redirect(
                     url_for("admin_dashboard")
                 )
+
 
             return redirect(
                 url_for("home")
@@ -849,6 +841,7 @@ def register():
             "Registration successful. Please login.",
             "success"
         )
+
 
         return redirect(
             url_for("login")
@@ -969,6 +962,7 @@ def predict():
         "ta"
     )
 
+
     file = selected_upload()
 
 
@@ -1014,6 +1008,7 @@ def predict():
     timestamp = datetime.now().strftime(
         "%Y%m%d%H%M%S"
     )
+
 
     filename = (
         f"{current_user.id}_{timestamp}_{filename}"
@@ -1201,6 +1196,79 @@ def admin_dashboard():
 with app.app_context():
 
     db.create_all()
+
+
+# =========================================================
+# AUTO CREATE ADMIN
+# =========================================================
+
+with app.app_context():
+
+    admin_email = os.getenv(
+        "ADMIN_EMAIL"
+    )
+
+    admin_password = os.getenv(
+        "ADMIN_PASSWORD"
+    )
+
+
+    if admin_email and admin_password:
+
+        admin_email = admin_email.strip().lower()
+
+
+        existing_admin = User.query.filter_by(
+            email=admin_email
+        ).first()
+
+
+        if existing_admin:
+
+            if existing_admin.role != "admin":
+
+                existing_admin.role = "admin"
+
+                db.session.commit()
+
+                print(
+                    "Existing user promoted to admin."
+                )
+
+            else:
+
+                print(
+                    "Admin already exists."
+                )
+
+
+        else:
+
+            new_admin = User(
+
+                name="Admin",
+
+                email=admin_email,
+
+                password=generate_password_hash(
+                    admin_password
+                ),
+
+                role="admin"
+
+            )
+
+
+            db.session.add(
+                new_admin
+            )
+
+            db.session.commit()
+
+
+            print(
+                "Admin created successfully."
+            )
 
 
 # =========================================================
