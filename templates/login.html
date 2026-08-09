@@ -13,36 +13,39 @@
         padding: 0;
     }
 
+    html,
     body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
+        width: 100%;
+        min-height: 100%;
+    }
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(225, 247, 255, 0.72),
-            rgba(246, 243, 232, 0.92)
-        ),
-        url("{{ url_for('static', filename='images/bg.jpg') }}")
-        center / cover fixed;
-}
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #e8f5e9, #f1f8e9, #ffffff);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 20px;
+    }
+
     .login-container {
         width: 100%;
         max-width: 430px;
+        margin: auto;
     }
 
     .login-card {
-    width: 90%;
-    max-width: 420px;
-    background: rgba(255, 253, 246, 0.96);
-    padding: 35px;
-    border-radius: 22px;
-    box-shadow: 0 18px 40px rgba(24, 32, 24, 0.18);
-}
+        width: 100%;
+        background: white;
+        border-radius: 24px;
+        padding: 38px 32px;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+        text-align: center;
+    }
 
     .logo {
         width: 85px;
@@ -50,9 +53,11 @@
         margin: 0 auto 18px;
         border-radius: 50%;
         background: #e8f5e9;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         font-size: 45px;
     }
 
@@ -66,6 +71,7 @@
         color: #666;
         font-size: 15px;
         margin-bottom: 28px;
+        line-height: 1.5;
     }
 
     .flash-message {
@@ -73,6 +79,7 @@
         border-radius: 10px;
         margin-bottom: 18px;
         font-size: 14px;
+        line-height: 1.4;
     }
 
     .flash-success {
@@ -86,6 +93,7 @@
     }
 
     .form-group {
+        width: 100%;
         text-align: left;
         margin-bottom: 18px;
     }
@@ -99,12 +107,20 @@
     }
 
     .form-group input {
+        display: block;
         width: 100%;
-        padding: 14px 15px;
+        height: 48px;
+
+        padding: 0 15px;
+
         border: 1px solid #d5d5d5;
         border-radius: 12px;
+
         font-size: 15px;
         outline: none;
+
+        background: #fff;
+
         transition: 0.2s;
     }
 
@@ -114,28 +130,33 @@
     }
 
     .login-btn {
+        display: block;
         width: 100%;
+        height: 50px;
+
         border: none;
-        padding: 14px;
         border-radius: 12px;
+
         background: #2e7d32;
         color: white;
+
         font-size: 16px;
         font-weight: 700;
+
         cursor: pointer;
+
         margin-top: 5px;
-        transition: 0.2s;
     }
 
     .login-btn:hover {
         background: #1b5e20;
-        transform: translateY(-1px);
     }
 
     .register-text {
         margin-top: 22px;
         color: #666;
         font-size: 14px;
+        line-height: 1.5;
     }
 
     .register-text a {
@@ -160,16 +181,91 @@
         color: #2e7d32;
     }
 
-    @media (max-width: 480px) {
+
+    /* ============================= */
+    /* MOBILE */
+    /* ============================= */
+
+    @media (max-width: 600px) {
+
+        body {
+            padding: 16px;
+            align-items: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+        }
+
         .login-card {
+            width: 100%;
             padding: 30px 22px;
+            border-radius: 20px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            font-size: 36px;
+            margin-bottom: 14px;
         }
 
         h1 {
             font-size: 26px;
         }
+
+        .subtitle {
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group input {
+            height: 48px;
+            font-size: 16px;
+        }
+
+        .login-btn {
+            height: 50px;
+            font-size: 16px;
+        }
+    }
+
+
+    /* ============================= */
+    /* SMALL PHONES */
+    /* ============================= */
+
+    @media (max-width: 380px) {
+
+        body {
+            padding: 12px;
+        }
+
+        .login-card {
+            padding: 25px 18px;
+        }
+
+        .logo {
+            width: 62px;
+            height: 62px;
+            font-size: 32px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+        }
     }
 </style>
+
 
 </head>
 
