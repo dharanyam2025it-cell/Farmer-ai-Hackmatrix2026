@@ -927,7 +927,10 @@ def home():
                 "%d %b %Y"
             ),
 
-            "image_url": scan.image_url
+            "image_url": url_for(
+    "uploaded_file",
+    filename=scan.image_url.split("/uploads/")[-1]
+)
 
         })
 
@@ -1138,7 +1141,10 @@ def predict():
                 "%d %b %Y"
             ),
 
-            "image_url": item.image_url
+            "image_url": url_for(
+    "uploaded_file",
+    filename=item.image_url.split("/uploads/")[-1]
+)
 
         })
 

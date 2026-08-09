@@ -303,12 +303,13 @@
                     <td>{{ scan.user_id }}</td>
 
                     <td>
-
-                        <img
-                            src="{{ scan.image_url }}"
-                            class="scan-image"
-                            alt="Leaf"
-                        >
+<td>
+    <img
+        src="{{ url_for('uploaded_file', filename=scan.image_url.split('/uploads/')[-1]) }}"
+        class="scan-image"
+        alt="Leaf"
+    >
+</td>
 
                     </td>
 
