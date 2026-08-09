@@ -398,3 +398,116 @@ def uploaded_file(filename):
         filename,
     )
 
+
+# =========================================================
+# PREDICT ROUTE
+# =========================================================
+
+@app.route("/predict", methods=["POST"])
+def predict():
+
+    lang = request.form.get("lang", "ta")
+
+    file = selected_upload()
+
+    # -----------------------------------------------------
+    # No image
+    # -----------------------------------------------------
+
+    if not file:
+
+        return render_template(
+            "index.html",
+            recent_scans=RECENT_SCANS,
+            error="Please choose or take one photo first.",
+        )
+
+    # -----------------------------------------------------
+    # Secure filename
+    # -----------------------------------------------------
+
+    filename = secure_filename(file.filename)
+
+    # If filename is empty
+    if not filename:
+
+        return render_template(
+            "index.html",
+            recent_scans=RECENT_SCANS,
+            error="Invalid image file.",
+        )
+
+    # -----------------------------------------------------
+    # Save image
+    # -----------------------------------------------------
+
+    filepath = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        filename,
+    )
+
+    file.save(filepath)
+
+    uploaded_url = f"/uploads/{filename}"
+
+    # -----------------------------------------------------
+    # Gemini AI analysis
+    # -----------------------------------------------------
+
+    result = analyze_leaf_image(filepath)
+
+    # -----------------------------------------------------
+    # Recent scan
+    # -----------------------------------------------------
+
+    RECENT_SCANS.insert(
+        0,
+        {
+            "title_ta": result.get(
+                "disease_ta",
+                "தெளிவான முடிவு இல்லை",
+            ),
+
+            "title_en": result.get(
+                "disease_en",
+                "Uncertain",
+            ),
+
+            "title_hi": result.get(
+                "disease_hi",
+                "अनिश्चित",
+            ),
+
+            "date": datetime.now().strftime(
+                "%d %b %Y"
+            ),
+
+            "image_url": uploaded_url,
+        },
+    )
+
+    # Keep only latest 5
+    del RECENT_SCANS[5:]
+
+    # -----------------------------------------------------
+    # Result page
+    # -----------------------------------------------------
+
+    return render_template(
+        "result.html",
+        lang=lang,
+        result=result,
+        uploaded_url=uploaded_url,
+        recent_scans=RECENT_SCANS,
+    )
+
+
+# =========================================================
+# RUN APP
+# =========================================================
+
+if __name__ == "__main__":
+
+    app.run(
+        debug=True
+    )
