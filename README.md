@@ -27,27 +27,43 @@ Technology Stack :
        1.HTML
        2.CSS
        3.JavaScript
-       4.Bootstrap
    Backend :
        1.Python
        2.Flask
    Artificial Intelligence / Machine Learning :
-       1.Python
-       2.Machine Learning / Deep Learning
-       3.Image Classification
-       4.Crop Leaf Image Dataset
+       1.Google Gemini API
+       2.Gemini Vision / Image Analysis
    Database :
-      1.SQLite / MySQL (use the database you actually implemented)
+      1.SQLite / MySQL 
+      2.Flask SQL Alchemy
    Tools & Platforms :
       1.VS Code
       2.Git & GitHub
-      3.Google Colab / Jupyter Notebook (if used)
+      3.Google AI Studio / Gemini API
 Team Members :
       1.Boobesh S
       2.Dharanya M
       3.Santhiya K
       4.Saraneesh G
 Setup Instructions :
+   1. Clone the Repository
+      https://github.com/dharanyam2025it-cell/Farmer-ai-Hackmatrix2026.git
+   2. Navigate to the Project Folder
+      cd Farmer-ai-Hackmatrix2026
+   3. Create a Virtual Environment
+      python -m venv venv
+   4. Activate the Virtual Environment
+      Windows:
+         venv\Scripts\activate
+      Linux / macOS:
+         source venv/bin/activate
+   5. Install Required Dependencies
+      pip install -r requirements.txt
+   6. Run the Application
+      python app.py
+   7. Open the Application
+      Open your browser and visit:
+      http://127.0.0.1:5000/
 
      
     
