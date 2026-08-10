@@ -33,7 +33,7 @@ The system helps farmers detect diseases early and make faster decisions for eff
 
 ## PPT Link
 
-Add your PPT link here.
+https://docs.google.com/presentation/d/1rsfO-eilBI6IGW4OOvaUGYcpjgPXAKgH/edit?usp=drivesdk&ouid=114162560236652972072&rtpof=true&sd=true
 
 ## Live Demonstration Link
 
