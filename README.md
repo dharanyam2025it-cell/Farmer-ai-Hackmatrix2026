@@ -35,9 +35,9 @@ The system helps farmers detect diseases early and make faster decisions for eff
 
 https://docs.google.com/presentation/d/1rsfO-eilBI6IGW4OOvaUGYcpjgPXAKgH/edit?usp=drivesdk&ouid=114162560236652972072&rtpof=true&sd=true
 
-## Live Demonstration Link
+## Live Demo Video Link
+https://drive.google.com/file/d/1BsOayUItxUkzYHhbLY9r1Bpd2H3ZskxA/view?usp=drivesdk
 
-Add your Live Demonstration link here.
 
 ## Technology Stack
 
@@ -129,3 +129,6 @@ Run:
 Open your browser and visit:
 
 `http://127.0.0.1:5000/`
+
+### Note:
+    only 20 uploads are allowed due to gemini API pre version.
