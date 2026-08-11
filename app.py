@@ -423,19 +423,38 @@ Return this exact JSON structure:
 }
 """
 
-        response = client.models.generate_content(
+        candidate_models = [
+            "gemini-flash-latest",
+            "gemini-3.5-flash",
+            "gemini-3.6-flash"
+        ]
 
-            model="gemini-3.6-flash",
+        response = None
+        used_model = None
+        last_error = None
 
-            contents=[
-                prompt,
-                image_part
-            ],
+        for model_name in candidate_models:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[
+                        prompt,
+                        image_part
+                    ],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json"
+                    )
+                )
+                used_model = model_name
+                break
+            except Exception as model_err:
+                last_error = model_err
+                err_str = str(model_err).lower()
+                if "401" in err_str or "unauthenticated" in err_str or "429" in err_str or "resource_exhausted" in err_str:
+                    break
 
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json"
-            )
-        )
+        if response is None:
+            raise last_error if last_error else Exception("All Gemini models failed")
 
         raw_text = response.text.strip()
 
@@ -568,7 +587,7 @@ Return this exact JSON structure:
 
             "ai_analysis": True,
 
-            "model": "gemini-3.6-flash"
+            "model": used_model or "gemini-2.5-flash"
         }
 
         return result
@@ -590,24 +609,32 @@ Return this exact JSON structure:
 
     except Exception as e:
 
+        err_msg = str(e)
         print(
             "Gemini API error:",
-            e
+            err_msg
         )
 
         result = unclear_result()
 
-        result["disease_en"] = (
-            "AI analysis failed"
-        )
-
-        result["disease_ta"] = (
-            "AI பகுப்பாய்வு தோல்வியடைந்தது"
-        )
-
-        result["disease_hi"] = (
-            "AI विश्लेषण विफल हुआ"
-        )
+        if "429" in err_msg or "resource_exhausted" in err_msg.lower() or "quota" in err_msg.lower():
+            result["disease_en"] = "API Limit Reached"
+            result["disease_ta"] = "API வரம்பு முடிந்தது (Limit Reached)"
+            result["disease_hi"] = "API सीमा समाप्त हो गई"
+            result["remedy_en"] = "Gemini API free tier quota limit reached. Please wait a few minutes or update your GEMINI_API_KEY in .env."
+            result["remedy_ta"] = "Gemini API இலவச வரம்பு முடிந்துவிட்டது. 1 நிமிடம் கழித்து முயற்சிக்கவும் அல்லது புதிய API Key சேர்க்கவும்."
+            result["remedy_hi"] = "Gemini API कोटा समाप्त हो गया। कृपया कुछ मिनट बाद पुनः प्रयास करें।"
+        elif "401" in err_msg or "unauthenticated" in err_msg.lower() or "access_token" in err_msg.lower():
+            result["disease_en"] = "Invalid Gemini API Key"
+            result["disease_ta"] = "தவறான Gemini API Key"
+            result["disease_hi"] = "अमान्य Gemini API Key"
+            result["remedy_en"] = "Please configure a valid GEMINI_API_KEY from Google AI Studio in your .env file."
+            result["remedy_ta"] = "Google AI Studio-வில் (aistudio.google.com) புதிய GEMINI_API_KEY உருவாக்கி .env கோப்பில் சேர்க்கவும்."
+            result["remedy_hi"] = "Google AI Studio से मान्य GEMINI_API_KEY प्राप्त कर .env फ़ाइल में दर्ज करें।"
+        else:
+            result["disease_en"] = "AI analysis failed"
+            result["disease_ta"] = "AI பகுப்பாய்வு தோல்வியடைந்தது"
+            result["disease_hi"] = "AI विश्लेषण विफल हुआ"
 
         return result
 
