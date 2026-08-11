@@ -425,7 +425,7 @@ Return this exact JSON structure:
 
         response = client.models.generate_content(
 
-            model="gemini-3.5-flash",
+            model="gemini-3.6-flash",
 
             contents=[
                 prompt,
@@ -568,7 +568,7 @@ Return this exact JSON structure:
 
             "ai_analysis": True,
 
-            "model": "gemini-3.5-flash"
+            "model": "gemini-3.6-flash"
         }
 
         return result
