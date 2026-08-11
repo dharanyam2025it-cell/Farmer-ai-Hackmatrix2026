@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>பயிர் நோய் | Farmer AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -26,6 +26,7 @@
                             <option value="hi">हिंदी</option>
                         </select>
                     </label>
+                    <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">🚪 Logout</a>
                 </div>
             </header>
 
@@ -81,15 +82,11 @@
                         </div>
                         {% endfor %}
                     </div>
-
-        </aside>
                 {% else %}
                     <p class="empty-state"><span class="ta">இன்னும் scan save ஆகவில்லை.</span><span class="en">No saved scans yet.</span><span class="hi">अभी कोई स्कैन सेव नहीं है.</span></p>
                 {% endif %}
             </div>
-                    <a href="{{ url_for('logout') }}" class="logout-btn">
-    🚪 Logout
-</a>
+        </aside>
     </main>
 
     <script>
@@ -120,6 +117,13 @@
         document.querySelector("[data-close-recents]").addEventListener("click", () => {
             drawer.classList.remove("open");
             drawer.setAttribute("aria-hidden", "true");
+        });
+
+        drawer.addEventListener("click", (e) => {
+            if (e.target === drawer) {
+                drawer.classList.remove("open");
+                drawer.setAttribute("aria-hidden", "true");
+            }
         });
     </script>
 </body>

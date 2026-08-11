@@ -1461,18 +1461,23 @@ body[data-lang="hi"] .en {
 .recent-drawer {
     position: fixed;
     inset: 0;
-    z-index: 20;
+    z-index: 999;
     display: grid;
     align-items: end;
     padding: 18px;
     background: rgba(0, 0, 0, 0);
     pointer-events: none;
-    transition: background 160ms ease;
+    opacity: 0;
+    visibility: hidden;
+    transition: background 200ms ease, opacity 200ms ease, visibility 200ms ease;
 }
 
 .recent-drawer.open {
-    background: rgba(0, 0, 0, 0.34);
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
     pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
 }
 
 .drawer-card {
@@ -1483,8 +1488,9 @@ body[data-lang="hi"] .en {
     padding: 18px;
     border-radius: 24px;
     background: #fffdf6;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
     transform: translateY(110%);
-    transition: transform 180ms ease;
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .recent-drawer.open .drawer-card {
@@ -1502,7 +1508,7 @@ body[data-lang="hi"] .en {
 .drawer-head h2 {
     margin: 0;
     color: var(--green-900);
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .empty-state {
@@ -1537,14 +1543,20 @@ body[data-lang="hi"] .en {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 18px;
-    border-radius: 12px;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 10px;
     background: #c92116;
     color: white;
     text-decoration: none;
-    font-weight: 800;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(201, 33, 22, 0.25);
+    transition: background 150ms ease, transform 100ms ease;
 }
 
 .logout-btn:hover {
     background: #a51b12;
+    transform: translateY(-1px);
 }
